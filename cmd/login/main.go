@@ -8,6 +8,7 @@ import (
 	"github.com/go-rod/rod"
 	"github.com/sirupsen/logrus"
 	"github.com/xpzouying/xiaohongshu-mcp/browser"
+	"github.com/xpzouying/xiaohongshu-mcp/configs"
 	"github.com/xpzouying/xiaohongshu-mcp/cookies"
 	"github.com/xpzouying/xiaohongshu-mcp/xiaohongshu"
 )
@@ -22,6 +23,13 @@ func main() {
 	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录")
 	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
 	flag.Parse()
+
+	// 初始化日志
+	if account != "" {
+		if err := configs.InitLogger(account); err != nil {
+			logrus.Fatalf("failed to init logger: %v", err)
+		}
+	}
 
 	// 构建浏览器选项
 	opts := []browser.Option{browser.WithBinPath(binPath)}

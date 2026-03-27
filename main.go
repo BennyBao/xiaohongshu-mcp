@@ -32,6 +32,11 @@ func main() {
 	configs.SetUserDataDir(userDataDir)
 	configs.SetAccount(account)
 
+	// 初始化日志
+	if err := configs.InitLogger(account); err != nil {
+		logrus.Fatalf("failed to init logger: %v", err)
+	}
+
 	// 初始化服务
 	xiaohongshuService := NewXiaohongshuService()
 
