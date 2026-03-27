@@ -10,7 +10,9 @@ import (
 )
 
 type browserConfig struct {
-	binPath string
+	binPath     string
+	userDataDir string
+	account     string
 }
 
 type Option func(*browserConfig)
@@ -18,6 +20,18 @@ type Option func(*browserConfig)
 func WithBinPath(binPath string) Option {
 	return func(c *browserConfig) {
 		c.binPath = binPath
+	}
+}
+
+func WithUserDataDir(userDataDir string) Option {
+	return func(c *browserConfig) {
+		c.userDataDir = userDataDir
+	}
+}
+
+func WithAccount(account string) Option {
+	return func(c *browserConfig) {
+		c.account = account
 	}
 }
 
@@ -48,19 +62,25 @@ func NewBrowser(headless bool, options ...Option) *headless_browser.Browser {
 		opts = append(opts, headless_browser.WithChromeBinPath(cfg.binPath))
 	}
 
+	// 设置 userDataDir
+	if cfg.userDataDir != "" {
+		opts = append(opts, headless_browser.WithUserDataDir(cfg.userDataDir))
+		logrus.Infof("Using userDataDir: %s", cfg.userDataDir)
+	}
+
 	// Read proxy from environment variable
 	if proxy := os.Getenv("XHS_PROXY"); proxy != "" {
 		opts = append(opts, headless_browser.WithProxy(proxy))
 		logrus.Infof("Using proxy: %s", maskProxyCredentials(proxy))
 	}
 
-	// 加载 cookies
-	cookiePath := cookies.GetCookiesFilePath()
+	// 加载 cookies（根据账号参数）
+	cookiePath := cookies.GetCookiesFilePathWithAccount(cfg.account)
 	cookieLoader := cookies.NewLoadCookie(cookiePath)
 
 	if data, err := cookieLoader.LoadCookies(); err == nil {
 		opts = append(opts, headless_browser.WithCookies(string(data)))
-		logrus.Debugf("loaded cookies from filesuccessfully")
+		logrus.Debugf("loaded cookies from file successfully: %s", cookiePath)
 	} else {
 		logrus.Warnf("failed to load cookies: %v", err)
 	}

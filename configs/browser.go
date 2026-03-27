@@ -3,7 +3,9 @@ package configs
 var (
 	useHeadless = true
 
-	binPath = ""
+	binPath     = ""
+	userDataDir = ""
+	account     = ""
 )
 
 func InitHeadless(h bool) {
@@ -21,4 +23,20 @@ func SetBinPath(b string) {
 
 func GetBinPath() string {
 	return binPath
+}
+
+func SetUserDataDir(dir string) {
+	userDataDir = dir
+}
+
+func GetUserDataDir() string {
+	return userDataDir
+}
+
+func SetAccount(acc string) {
+	account = acc
+}
+
+func GetAccount() string {
+	return account
 }

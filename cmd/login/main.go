@@ -14,13 +14,26 @@ import (
 
 func main() {
 	var (
-		binPath string // 浏览器二进制文件路径
+		binPath     string // 浏览器二进制文件路径
+		userDataDir string // 浏览器 userData 目录
+		account     string // 账号名称
 	)
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
+	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录")
+	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
 	flag.Parse()
 
+	// 构建浏览器选项
+	opts := []browser.Option{browser.WithBinPath(binPath)}
+	if userDataDir != "" {
+		opts = append(opts, browser.WithUserDataDir(userDataDir))
+	}
+	if account != "" {
+		opts = append(opts, browser.WithAccount(account))
+	}
+
 	// 登录的时候，需要界面，所以不能无头模式
-	b := browser.NewBrowser(false, browser.WithBinPath(binPath))
+	b := browser.NewBrowser(false, opts...)
 	defer b.Close()
 
 	page := b.NewPage()
@@ -44,7 +57,7 @@ func main() {
 	if err = action.Login(context.Background()); err != nil {
 		logrus.Fatalf("登录失败: %v", err)
 	} else {
-		if err := saveCookies(page); err != nil {
+		if err := saveCookies(page, account); err != nil {
 			logrus.Fatalf("failed to save cookies: %v", err)
 		}
 	}
@@ -63,7 +76,7 @@ func main() {
 
 }
 
-func saveCookies(page *rod.Page) error {
+func saveCookies(page *rod.Page, account string) error {
 	cks, err := page.Browser().GetCookies()
 	if err != nil {
 		return err
@@ -74,6 +87,7 @@ func saveCookies(page *rod.Page) error {
 		return err
 	}
 
-	cookieLoader := cookies.NewLoadCookie(cookies.GetCookiesFilePath())
+	cookiePath := cookies.GetCookiesFilePathWithAccount(account)
+	cookieLoader := cookies.NewLoadCookie(cookiePath)
 	return cookieLoader.SaveCookies(data)
 }

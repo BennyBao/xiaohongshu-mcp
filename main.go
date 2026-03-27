@@ -10,12 +10,16 @@ import (
 
 func main() {
 	var (
-		headless bool
-		binPath  string // 浏览器二进制文件路径
-		port     string
+		headless    bool
+		binPath     string // 浏览器二进制文件路径
+		userDataDir string // 浏览器 userData 目录
+		account     string // 账号名称
+		port        string
 	)
 	flag.BoolVar(&headless, "headless", true, "是否无头模式")
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
+	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录")
+	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
 	flag.StringVar(&port, "port", ":18060", "端口")
 	flag.Parse()
 
@@ -25,6 +29,8 @@ func main() {
 
 	configs.InitHeadless(headless)
 	configs.SetBinPath(binPath)
+	configs.SetUserDataDir(userDataDir)
+	configs.SetAccount(account)
 
 	// 初始化服务
 	xiaohongshuService := NewXiaohongshuService()

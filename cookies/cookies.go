@@ -56,21 +56,34 @@ func (c *localCookie) DeleteCookies() error {
 // 为了向后兼容，如果旧路径 /tmp/cookies.json 存在，则继续使用；
 // 否则使用当前目录下的 cookies.json
 func GetCookiesFilePath() string {
-	// 旧路径：/tmp/cookies.json
-	tmpDir := os.TempDir()
-	oldPath := filepath.Join(tmpDir, "cookies.json")
+	return GetCookiesFilePathWithAccount("")
+}
 
-	// 检查旧路径文件是否存在
-	if _, err := os.Stat(oldPath); err == nil {
-		// 文件存在，使用旧路径（向后兼容）
-		return oldPath
+// GetCookiesFilePathWithAccount 根据账号名获取 cookies 文件路径
+// 如果 account 为空，使用默认路径；否则使用 cookies/{account}.json
+func GetCookiesFilePathWithAccount(account string) string {
+	// 旧路径：/tmp/cookies.json（仅在无账号参数时检查）
+	if account == "" {
+		tmpDir := os.TempDir()
+		oldPath := filepath.Join(tmpDir, "cookies.json")
+
+		// 检查旧路径文件是否存在
+		if _, err := os.Stat(oldPath); err == nil {
+			return oldPath
+		}
+
+		path := os.Getenv("COOKIES_PATH")
+		if path == "" {
+			path = "cookies.json"
+		}
+		return path
 	}
 
-	path := os.Getenv("COOKIES_PATH") // 判断环境变量
-	if path == "" {
-		path = "cookies.json" // fallback，本地调试时用当前目录
+	// 多账号模式：使用 cookies/{account}.json
+	cookiesDir := "cookies"
+	if err := os.MkdirAll(cookiesDir, 0755); err != nil {
+		// 如果创建目录失败，回退到当前目录
+		return account + ".json"
 	}
-
-	// 文件不存在，使用新路径（当前目录）
-	return path
+	return filepath.Join(cookiesDir, account+".json")
 }
