@@ -19,7 +19,7 @@ func InitLogger(account string) error {
 	}
 
 	// 创建账号目录
-	accountDir := filepath.Join("accounts", account)
+	accountDir := filepath.Join("xhs-accounts", account)
 	if err := os.MkdirAll(accountDir, 0755); err != nil {
 		return err
 	}

@@ -80,7 +80,7 @@ func GetCookiesFilePathWithAccount(account string) string {
 	}
 
 	// 多账号模式：使用 ./xhs-accounts/{account}/cookies.json
-	accountDir := filepath.Join("accounts", account)
+	accountDir := filepath.Join("xhs-accounts", account)
 	if err := os.MkdirAll(accountDir, 0755); err != nil {
 		// 如果创建目录失败，回退到当前目录
 		return account + ".json"
