@@ -60,7 +60,7 @@ func GetCookiesFilePath() string {
 }
 
 // GetCookiesFilePathWithAccount 根据账号名获取 cookies 文件路径
-// 如果 account 为空，使用默认路径；否则使用 ../accounts/{account}/cookies.json
+// 如果 account 为空，使用默认路径；否则使用 ./xhs-accounts/{account}/cookies.json
 func GetCookiesFilePathWithAccount(account string) string {
 	// 旧路径：/tmp/cookies.json（仅在无账号参数时检查）
 	if account == "" {
@@ -79,7 +79,7 @@ func GetCookiesFilePathWithAccount(account string) string {
 		return path
 	}
 
-	// 多账号模式：使用 ../accounts/{account}/cookies.json
+	// 多账号模式：使用 ./xhs-accounts/{account}/cookies.json
 	accountDir := filepath.Join("accounts", account)
 	if err := os.MkdirAll(accountDir, 0755); err != nil {
 		// 如果创建目录失败，回退到当前目录
