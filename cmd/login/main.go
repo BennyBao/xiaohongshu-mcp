@@ -15,12 +15,10 @@ import (
 
 func main() {
 	var (
-		binPath     string // 浏览器二进制文件路径
-		userDataDir string // 浏览器 userData 目录
-		account     string // 账号名称
+		binPath string // 浏览器二进制文件路径
+		account string // 账号名称
 	)
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
-	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录")
 	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
 	flag.Parse()
 
@@ -33,9 +31,6 @@ func main() {
 
 	// 构建浏览器选项
 	opts := []browser.Option{browser.WithBinPath(binPath)}
-	if userDataDir != "" {
-		opts = append(opts, browser.WithUserDataDir(userDataDir))
-	}
 	if account != "" {
 		opts = append(opts, browser.WithAccount(account))
 	}
@@ -57,6 +52,11 @@ func main() {
 	logrus.Infof("当前登录状态: %v", status)
 
 	if status {
+		// 已登录，刷新保存一次 cookies
+		if err := saveCookies(page, account); err != nil {
+			logrus.Fatalf("failed to save cookies: %v", err)
+		}
+		logrus.Info("已登录，cookies 已刷新")
 		return
 	}
 

@@ -9,7 +9,8 @@ import (
 )
 
 // InitLogger 初始化日志配置
-// 如果指定了账号，日志会保存到 accounts/{account}/app.log
+// 如果指定了账号，日志会保存到 ../accounts/{account}/app.log
+// 每次初始化时会清空之前的日志文件
 func InitLogger(account string) error {
 	if account == "" {
 		// 无账号时，只输出到控制台
@@ -23,9 +24,9 @@ func InitLogger(account string) error {
 		return err
 	}
 
-	// 创建日志文件
+	// 创建日志文件（每次启动时清空）
 	logFile := filepath.Join(accountDir, "app.log")
-	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
 		return err
 	}

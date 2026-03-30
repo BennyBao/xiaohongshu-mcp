@@ -548,10 +548,6 @@ func (s *XiaohongshuService) ReplyCommentToFeed(ctx context.Context, feedID, xse
 func newBrowser() *headless_browser.Browser {
 	opts := []browser.Option{browser.WithBinPath(configs.GetBinPath())}
 
-	if userDataDir := configs.GetUserDataDir(); userDataDir != "" {
-		opts = append(opts, browser.WithUserDataDir(userDataDir))
-	}
-
 	if account := configs.GetAccount(); account != "" {
 		opts = append(opts, browser.WithAccount(account))
 	}

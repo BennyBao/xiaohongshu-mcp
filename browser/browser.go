@@ -10,9 +10,8 @@ import (
 )
 
 type browserConfig struct {
-	binPath     string
-	userDataDir string
-	account     string
+	binPath string
+	account string
 }
 
 type Option func(*browserConfig)
@@ -20,12 +19,6 @@ type Option func(*browserConfig)
 func WithBinPath(binPath string) Option {
 	return func(c *browserConfig) {
 		c.binPath = binPath
-	}
-}
-
-func WithUserDataDir(userDataDir string) Option {
-	return func(c *browserConfig) {
-		c.userDataDir = userDataDir
 	}
 }
 
@@ -60,12 +53,6 @@ func NewBrowser(headless bool, options ...Option) *headless_browser.Browser {
 	}
 	if cfg.binPath != "" {
 		opts = append(opts, headless_browser.WithChromeBinPath(cfg.binPath))
-	}
-
-	// 设置 userDataDir
-	if cfg.userDataDir != "" {
-		opts = append(opts, headless_browser.WithUserDataDir(cfg.userDataDir))
-		logrus.Infof("Using userDataDir: %s", cfg.userDataDir)
 	}
 
 	// Read proxy from environment variable
