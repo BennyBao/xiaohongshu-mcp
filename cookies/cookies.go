@@ -80,8 +80,8 @@ func GetCookiesFilePathWithAccount(account string) string {
 		return path
 	}
 
-	// 多账号模式：使用 {OPENCLAW_WORKSPACE}/{account}/cookies.json
-	accountDir := filepath.Join(configs.GetWorkspace(), account)
+	// 多账号模式：使用 {OPENCLAW_WORKSPACE}/xhs-accounts/{account}/cookies.json
+	accountDir := filepath.Join(configs.GetWorkspace(), "xhs-accounts", account)
 	if err := os.MkdirAll(accountDir, 0755); err != nil {
 		panic("无法创建账号目录: " + accountDir + ": " + err.Error())
 	}
