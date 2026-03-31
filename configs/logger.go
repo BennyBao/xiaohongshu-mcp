@@ -9,7 +9,7 @@ import (
 )
 
 // InitLogger 初始化日志配置
-// 如果指定了账号，日志会保存到 ./xhs-accounts/{account}/app.log
+// 如果指定了账号，日志会保存到 {OPENCLAW_WORKSPACE}/{account}/app.log
 // 每次初始化时会清空之前的日志文件
 func InitLogger(account string) error {
 	if account == "" {
@@ -19,7 +19,7 @@ func InitLogger(account string) error {
 	}
 
 	// 创建账号目录
-	accountDir := filepath.Join("xhs-accounts", account)
+	accountDir := filepath.Join(GetWorkspace(), account)
 	if err := os.MkdirAll(accountDir, 0755); err != nil {
 		return err
 	}

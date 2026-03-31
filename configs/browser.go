@@ -1,5 +1,7 @@
 package configs
 
+import "os"
+
 var (
 	useHeadless = true
 
@@ -30,4 +32,14 @@ func SetAccount(acc string) {
 
 func GetAccount() string {
 	return account
+}
+
+// GetWorkspace 从 OPENCLAW_WORKSPACE 环境变量获取工作目录。
+// 若未设置则 panic，程序应在启动时尽早调用以快速失败。
+func GetWorkspace() string {
+	ws := os.Getenv("OPENCLAW_WORKSPACE")
+	if ws == "" {
+		panic("环境变量 OPENCLAW_WORKSPACE 未设置，程序无法启动")
+	}
+	return ws
 }

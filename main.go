@@ -28,6 +28,7 @@ func main() {
 	configs.InitHeadless(headless)
 	configs.SetBinPath(binPath)
 	configs.SetAccount(account)
+	configs.GetWorkspace() // 提前校验 OPENCLAW_WORKSPACE，未设置则立即 panic
 
 	// 初始化日志
 	if err := configs.InitLogger(account); err != nil {
