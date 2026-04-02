@@ -5,8 +5,9 @@ import "os"
 var (
 	useHeadless = true
 
-	binPath = ""
-	account = ""
+	binPath     = ""
+	account     = ""
+	userDataDir = ""
 )
 
 func InitHeadless(h bool) {
@@ -42,4 +43,14 @@ func GetWorkspace() string {
 		panic("环境变量 OPENCLAW_WORKSPACE 未设置，程序无法启动")
 	}
 	return ws
+}
+
+// SetUserDataDir 设置浏览器 userData 目录
+func SetUserDataDir(dir string) {
+	userDataDir = dir
+}
+
+// GetUserDataDir 获取浏览器 userData 目录
+func GetUserDataDir() string {
+	return userDataDir
 }

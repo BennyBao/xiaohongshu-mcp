@@ -10,14 +10,16 @@ import (
 
 func main() {
 	var (
-		headless bool
-		binPath  string // 浏览器二进制文件路径
-		account  string // 账号名称
-		port     string
+		headless    bool
+		binPath     string // 浏览器二进制文件路径
+		account     string // 账号名称
+		userDataDir string // 浏览器 userData 目录
+		port        string
 	)
 	flag.BoolVar(&headless, "headless", true, "是否无头模式")
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
 	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
+	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录（可选）")
 	flag.StringVar(&port, "port", ":18060", "端口")
 	flag.Parse()
 
@@ -28,6 +30,7 @@ func main() {
 	configs.InitHeadless(headless)
 	configs.SetBinPath(binPath)
 	configs.SetAccount(account)
+	configs.SetUserDataDir(userDataDir)
 	configs.GetWorkspace() // 提前校验 OPENCLAW_WORKSPACE，未设置则立即 panic
 
 	// 初始化日志

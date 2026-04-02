@@ -15,11 +15,13 @@ import (
 
 func main() {
 	var (
-		binPath string // 浏览器二进制文件路径
-		account string // 账号名称
+		binPath     string // 浏览器二进制文件路径
+		account     string // 账号名称
+		userDataDir string // 浏览器 userData 目录
 	)
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
 	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
+	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录（可选）")
 	flag.Parse()
 
 	// 初始化日志
@@ -29,10 +31,21 @@ func main() {
 		}
 	}
 
+	// 设置配置
+	if account != "" {
+		configs.SetAccount(account)
+	}
+	if userDataDir != "" {
+		configs.SetUserDataDir(userDataDir)
+	}
+
 	// 构建浏览器选项
 	opts := []browser.Option{browser.WithBinPath(binPath)}
 	if account != "" {
 		opts = append(opts, browser.WithAccount(account))
+	}
+	if userDataDir != "" {
+		opts = append(opts, browser.WithUserDataDir(userDataDir))
 	}
 
 	// 登录的时候，需要界面，所以不能无头模式

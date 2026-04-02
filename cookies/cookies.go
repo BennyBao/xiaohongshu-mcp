@@ -1,12 +1,19 @@
 package cookies
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 
 	"github.com/pkg/errors"
 	"github.com/xpzouying/xiaohongshu-mcp/configs"
 )
+
+// AccountsConfig accounts.json 配置结构
+type AccountsConfig struct {
+	DefaultAccount string                 `json:"default_account"`
+	Accounts       map[string]interface{} `json:"accounts"`
+}
 
 type Cookier interface {
 	LoadCookies() ([]byte, error)
@@ -53,34 +60,49 @@ func (c *localCookie) DeleteCookies() error {
 	return os.Remove(c.path)
 }
 
-// GetCookiesFilePath 获取 cookies 文件路径。
-// 为了向后兼容，如果旧路径 /tmp/cookies.json 存在，则继续使用；
-// 否则使用当前目录下的 cookies.json
+// getDefaultAccount 从 accounts.json 获取默认账号
+// 如果指定了 default_account 则使用它；否则如果只有一个账号则使用该账号
+func getDefaultAccount() string {
+	accountsPath := filepath.Join(configs.GetWorkspace(), "skills", "post-to-xhs", "config", "accounts.json")
+	data, err := os.ReadFile(accountsPath)
+	if err != nil {
+		panic("无法读取 accounts.json: " + err.Error())
+	}
+
+	var cfg AccountsConfig
+	if err := json.Unmarshal(data, &cfg); err != nil {
+		panic("无法解析 accounts.json: " + err.Error())
+	}
+
+	// 如果指定了默认账号，使用它
+	if cfg.DefaultAccount != "" {
+		return cfg.DefaultAccount
+	}
+
+	// 如果只有一个账号，使用它
+	if len(cfg.Accounts) == 1 {
+		for name := range cfg.Accounts {
+			return name
+		}
+	}
+
+	panic("accounts.json 中未指定 default_account 且账号数量不为 1")
+}
+
+// GetCookiesFilePath 获取 cookies 文件路径
+// 自动从 accounts.json 获取默认账号
 func GetCookiesFilePath() string {
 	return GetCookiesFilePathWithAccount("")
 }
 
 // GetCookiesFilePathWithAccount 根据账号名获取 cookies 文件路径
-// 如果 account 为空，使用默认路径；否则使用 {OPENCLAW_WORKSPACE}/{account}/cookies.json
+// 如果 account 为空，从 accounts.json 获取默认账号
+// 返回路径格式：{OPENCLAW_WORKSPACE}/xhs-accounts/{account}/cookies.json
 func GetCookiesFilePathWithAccount(account string) string {
-	// 旧路径：/tmp/cookies.json（仅在无账号参数时检查）
 	if account == "" {
-		tmpDir := os.TempDir()
-		oldPath := filepath.Join(tmpDir, "cookies.json")
-
-		// 检查旧路径文件是否存在
-		if _, err := os.Stat(oldPath); err == nil {
-			return oldPath
-		}
-
-		path := os.Getenv("COOKIES_PATH")
-		if path == "" {
-			path = "cookies.json"
-		}
-		return path
+		account = getDefaultAccount()
 	}
 
-	// 多账号模式：使用 {OPENCLAW_WORKSPACE}/xhs-accounts/{account}/cookies.json
 	accountDir := filepath.Join(configs.GetWorkspace(), "xhs-accounts", account)
 	if err := os.MkdirAll(accountDir, 0755); err != nil {
 		panic("无法创建账号目录: " + accountDir + ": " + err.Error())
