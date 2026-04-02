@@ -97,7 +97,7 @@ func GetCookiesFilePath() string {
 
 // GetCookiesFilePathWithAccount 根据账号名获取 cookies 文件路径
 // 如果 account 为空，从 accounts.json 获取默认账号
-// 返回路径格式：{OPENCLAW_WORKSPACE}/xhs-accounts/{account}/cookies.json
+// 返回路径格式：{workDir}/xhs-accounts/{account}/cookies.json
 func GetCookiesFilePathWithAccount(account string) string {
 	if account == "" {
 		account = getDefaultAccount()

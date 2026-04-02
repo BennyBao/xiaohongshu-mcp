@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
+	"os"
 
 	"github.com/go-rod/rod"
 	"github.com/sirupsen/logrus"
@@ -18,11 +20,21 @@ func main() {
 		binPath     string // 浏览器二进制文件路径
 		account     string // 账号名称
 		userDataDir string // 浏览器 userData 目录
+		workDir     string // 工作目录（必传）
 	)
 	flag.StringVar(&binPath, "bin", "", "浏览器二进制文件路径")
 	flag.StringVar(&account, "account", "", "账号名称（用于多账号支持）")
 	flag.StringVar(&userDataDir, "user-data-dir", "", "浏览器 userData 目录（可选）")
+	flag.StringVar(&workDir, "workDir", "", "工作目录（必传），账号数据存储在 {workDir}/xhs-accounts/ 下")
 	flag.Parse()
+
+	if workDir == "" {
+		fmt.Fprintln(os.Stderr, "错误：-workDir 参数为必传项")
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	configs.SetWorkspace(workDir)
 
 	// 初始化日志
 	if account != "" {
